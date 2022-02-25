@@ -1,8 +1,14 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import ContactItem from "../ContactItem/ContactItem";
+import { contactActions } from "../../slice/contactSlice";
+
 const ContactList = (props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [contacts, setContacts] = useState(false);
+  const contacts = useSelector((state) => state.contacts);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -13,14 +19,12 @@ const ContactList = (props) => {
       .then((res) => {
         setIsLoading(false);
         if (res.statusText === "OK") {
-          setContacts(res.data);
+          dispatch(contactActions.replaceContacts(res.data));
         }
       })
       .catch((err) => {
         if (axios.isCancel(err)) {
           console.log("successfully aborted");
-        } else {
-          // handle error
         }
       });
 
@@ -41,17 +45,12 @@ const ContactList = (props) => {
           </thead>
           <tbody>
             {contacts.map((item) => {
-              return (
-                <tr key={item.id}>
-                  <td>{item.name}</td>
-                  <td>{item.number}</td>
-                </tr>
-              );
+              return <ContactItem key={item.id} item={item} />;
             })}
           </tbody>
         </table>
       )}
-      {!contacts && <p>Loading</p>}
+      {isLoading && !contacts && <p>Loading</p>}
     </>
   );
 };
