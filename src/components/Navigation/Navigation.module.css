@@ -1,0 +1,14 @@
+.navigation{
+    padding: 10px;
+    background-color: #7c1717;
+    display: flex;
+    justify-content: center;
+}
+.navigation__a{
+    color: white;
+    margin-right: 10px;
+    text-decoration: none;
+}
+.active{
+    text-decoration: underline;
+}
