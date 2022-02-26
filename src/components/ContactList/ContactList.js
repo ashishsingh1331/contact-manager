@@ -3,37 +3,17 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ContactItem from "../ContactItem/ContactItem";
 import { contactActions } from "../../slice/contactSlice";
-
+import { fetchContacts } from "../../slice/contactSlice";
 const ContactList = (props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const contacts = useSelector((state) => state.contacts);
+  const contacts = useSelector((state) => state.contact.contacts);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    const fetchContacts = async () => {
-      setIsLoading(true);
-      const response = await axios.get(
-        "https://contact-54021-default-rtdb.firebaseio.com/contacts.json"
-      );
-
-      if (response.statusText !=='OK' ) {
-        throw new Error("Fetching contacts data failed");
-      }
-
-      const responseData = await response.data;
-      setIsLoading(false);
-
-      dispatch(contactActions.replaceContacts(responseData));
-    };
-
-    fetchContacts().catch((err) => {
-      if (axios.isCancel(err)) {
-        console.log("successfully aborted");
-      }
-    });
+    dispatch(fetchContacts());
     // Clean up function this is useful when we want to perform functionality at timem of component unmounting
     return () => {
       source.cancel();
