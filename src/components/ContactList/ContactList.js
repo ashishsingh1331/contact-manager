@@ -13,30 +13,38 @@ const ContactList = (props) => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    setIsLoading(true);
-    axios
-      .get("https://contact-54021-default-rtdb.firebaseio.com/contacts.json")
-      .then((res) => {
-        setIsLoading(false);
-        if (res.statusText === "OK") {
-          dispatch(contactActions.replaceContacts(res.data));
-        }
-      })
-      .catch((err) => {
-        if (axios.isCancel(err)) {
-          console.log("successfully aborted");
-        }
-      });
+    const fetchContacts = async () => {
+      setIsLoading(true);
+      const response = await axios.get(
+        "https://contact-54021-default-rtdb.firebaseio.com/contacts.json"
+      );
 
+      if (response.statusText !=='OK' ) {
+        throw new Error("Fetching contacts data failed");
+      }
+
+      const responseData = await response.data;
+      setIsLoading(false);
+
+      dispatch(contactActions.replaceContacts(responseData));
+    };
+
+    fetchContacts().catch((err) => {
+      if (axios.isCancel(err)) {
+        console.log("successfully aborted");
+      }
+    });
+    // Clean up function this is useful when we want to perform functionality at timem of component unmounting
     return () => {
       source.cancel();
+      dispatch(contactActions.replaceContacts(false));
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <>
       {contacts && (
-        <table>
+        <table className="table">
           <thead>
             <tr>
               <th>name</th>
