@@ -19,6 +19,7 @@ const uiSlice = createSlice({
       };
     },
   },
+  redirect(state, payload) {},
 });
 
 export default uiSlice.reducer;

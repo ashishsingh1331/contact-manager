@@ -35,8 +35,9 @@ const ContactList = (props) => {
             </tr>
           </thead>
           <tbody>
-            {contacts.map((item) => {
-              return <ContactItem key={item.id} item={item} />;
+            {Object.entries(contacts).map((val) => {
+              const [id, item] = val;
+              return <ContactItem id={id} key={id} item={item} />;
             })}
           </tbody>
         </table>

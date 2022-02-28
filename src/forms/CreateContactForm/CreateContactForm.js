@@ -1,10 +1,11 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import { createContact } from "../../slice/contactSlice";
 import { useDispatch } from "react-redux";
 
 const CreateContactForm = () => {
   let { id } = useParams();
+  const navigate = useNavigate();
   const contactNameRef = useRef();
   const contactNumberRef = useRef();
   const dispatch = useDispatch();
@@ -15,7 +16,7 @@ const CreateContactForm = () => {
       name: contactNameRef.current.value,
       number: contactNumberRef.current.value,
     };
-    dispatch(createContact(contact));
+    dispatch(createContact(contact, navigate));
     e.preventDefault();
   };
 

@@ -11,10 +11,7 @@ const contactSlice = createSlice({
   reducers: {
     addContact() {},
     replaceContacts(state, payload) {
-      // Transformed object to array
-      state.contacts = Object.entries(payload.payload).map((value) => {
-        return value.pop(); // pop removed the last element and return it
-      });
+      state.contacts = payload.payload;
     },
   },
 });
@@ -61,7 +58,7 @@ export const fetchContacts = () => {
   };
 };
 // Created action thunk for creating contacts
-export const createContact = (contact) => {
+export const createContact = (contact, navigate) => {
   return async (dispatch) => {
     dispatch(
       uiActions.showNotification({
@@ -89,9 +86,53 @@ export const createContact = (contact) => {
       dispatch(
         uiActions.showNotification({
           status: "success",
+          message: "Contacts Created successfully",
+        })
+      );
+      navigate("/");
+    } catch (error) {
+      dispatch(
+        uiActions.showNotification({
+          status: "danger",
+          message: error.message + " while creating contacts",
+        })
+      );
+    }
+  };
+};
+
+// Created action thunk for fetching contacts
+export const fetchContactById = (id) => {
+  return async (dispatch) => {
+    dispatch(
+      uiActions.showNotification({
+        status: "info",
+        message: "Fetching Contacts",
+      })
+    );
+
+    const sendRequest = async () => {
+      const response = await axios.get(
+        `https://contact-54021-default-rtdb.firebaseio.com/contacts/${id}.json`
+      );
+
+      if (response.statusText !== "OK") {
+        throw new Error("Fetching contacts data failed");
+      }
+
+      const responseData = await response.data;
+      return responseData;
+    };
+
+    try {
+      const data = await sendRequest();
+      dispatch(
+        uiActions.showNotification({
+          status: "success",
           message: "Contacts Fetched successfully",
         })
       );
+      return data;
     } catch (error) {
       dispatch(
         uiActions.showNotification({
