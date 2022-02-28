@@ -2,10 +2,11 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ContactItem from "../ContactItem/ContactItem";
-import { contactActions } from "../../slice/contactSlice";
+
 import { fetchContacts } from "../../slice/contactSlice";
+import { Outlet } from "react-router-dom";
+import { uiActions } from "../../slice/ui-slice";
 const ContactList = (props) => {
-  const [isLoading, setIsLoading] = useState(false);
   const contacts = useSelector((state) => state.contact.contacts);
   const dispatch = useDispatch();
 
@@ -17,7 +18,7 @@ const ContactList = (props) => {
     // Clean up function this is useful when we want to perform functionality at timem of component unmounting
     return () => {
       source.cancel();
-      dispatch(contactActions.replaceContacts(false));
+      dispatch(uiActions.hideNotification());
     };
   }, [dispatch]);
 
@@ -29,6 +30,8 @@ const ContactList = (props) => {
             <tr>
               <th>name</th>
               <th>number</th>
+              <th>detail</th>
+              <th>edit</th>
             </tr>
           </thead>
           <tbody>
@@ -38,7 +41,7 @@ const ContactList = (props) => {
           </tbody>
         </table>
       )}
-      {isLoading && !contacts && <p>Loading</p>}
+      <Outlet />
     </>
   );
 };
