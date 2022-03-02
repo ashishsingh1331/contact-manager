@@ -4,6 +4,7 @@ import { uiActions } from "./ui-slice";
 import axios from "axios";
 const initialState = {
   contacts: false,
+  transformedContact: false,
 };
 const contactSlice = createSlice({
   name: "contact",
@@ -11,7 +12,27 @@ const contactSlice = createSlice({
   reducers: {
     addContact() {},
     replaceContacts(state, payload) {
+      if (payload.payload === null) {
+        state.contacts = false;
+        state.transformedContact = false;
+        return;
+      }
       state.contacts = payload.payload;
+      state.transformedContact = Object.entries(payload.payload).map(
+        ([id, contact]) => {
+          contact["firebaseContactId"] = id;
+          return contact;
+        }
+      );
+    },
+    sortContacts(state, payload) {
+      state.transformedContact = state.transformedContact.sort((a, b) => {
+        return a.name > b.name ? 1 : -1;
+      });
+    },
+    emptyContacts(state) {
+      state.contacts = false;
+      state.transformedContact = [];
     },
   },
 });
@@ -130,6 +151,49 @@ export const fetchContactById = (id) => {
         uiActions.showNotification({
           status: "success",
           message: "Contacts Fetched successfully",
+        })
+      );
+      return data;
+    } catch (error) {
+      dispatch(
+        uiActions.showNotification({
+          status: "danger",
+          message: error.message + " while fetching contacts",
+        })
+      );
+    }
+  };
+};
+// Created action thunk for fetching contacts
+export const updateContactById = (id, contact) => {
+  return async (dispatch) => {
+    dispatch(
+      uiActions.showNotification({
+        status: "info",
+        message: "updating  Contact",
+      })
+    );
+
+    const sendRequest = async () => {
+      const response = await axios.put(
+        `https://contact-54021-default-rtdb.firebaseio.com/contacts/${id}.json`,
+        contact
+      );
+
+      if (response.statusText !== "OK") {
+        throw new Error("Fetching contacts data failed");
+      }
+
+      const responseData = await response.data;
+      return responseData;
+    };
+
+    try {
+      const data = await sendRequest();
+      dispatch(
+        uiActions.showNotification({
+          status: "success",
+          message: "Contact updated successfully",
         })
       );
       return data;

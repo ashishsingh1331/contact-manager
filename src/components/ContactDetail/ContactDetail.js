@@ -6,7 +6,7 @@ import { fetchContactById } from "../../slice/contactSlice";
 const ContactDetail = () => {
   const { id } = useParams();
   const [selectedContact, setSelectedContact] = useState("");
-  const dispatch = useDispatch(id);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // console.log(dispatch(fetchContactById(id)));

@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ContactItem from "../ContactItem/ContactItem";
 
-import { fetchContacts } from "../../slice/contactSlice";
+import { contactActions, fetchContacts } from "../../slice/contactSlice";
 import { Outlet } from "react-router-dom";
 import { uiActions } from "../../slice/ui-slice";
 const ContactList = (props) => {
-  const contacts = useSelector((state) => state.contact.contacts);
+  const contacts = useSelector((state) => state.contact.transformedContact);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -19,8 +19,13 @@ const ContactList = (props) => {
     return () => {
       source.cancel();
       dispatch(uiActions.hideNotification());
+      dispatch(contactActions.emptyContacts());
     };
   }, [dispatch]);
+
+  const sortContactsHandler = () => {
+    dispatch(contactActions.sortContacts());
+  };
 
   return (
     <>
@@ -28,20 +33,20 @@ const ContactList = (props) => {
         <table className="table">
           <thead>
             <tr>
-              <th>name</th>
+              <th onClick={sortContactsHandler}>name</th>
               <th>number</th>
               <th>detail</th>
               <th>edit</th>
             </tr>
           </thead>
           <tbody>
-            {Object.entries(contacts).map((val) => {
-              const [id, item] = val;
-              return <ContactItem id={id} key={id} item={item} />;
+            {contacts.map((item) => {
+              return <ContactItem key={item.id} item={item} />;
             })}
           </tbody>
         </table>
       )}
+      {!contacts && <p>No contacts</p>}
       <Outlet />
     </>
   );
